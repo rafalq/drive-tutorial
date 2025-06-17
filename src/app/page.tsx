@@ -8,7 +8,7 @@ export default function HomePage() {
           Drive Tutorial is dope!
         </h1>
       </div>
-      <div className="w-full px-8">
+      <div className="w-full max-w-2/3 px-8">
         <GoogleDriveClone />
       </div>
     </main>
