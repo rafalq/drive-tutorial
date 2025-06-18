@@ -1,23 +1,30 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { mockFiles, mockFolders } from "@/lib/mock-data";
+import { type files, type folders } from "@/server/db/schema";
 import { ChevronRight, Upload } from "lucide-react";
 import { useMemo, useState } from "react";
 import { FileRow, FolderRow } from "./dir-row";
 
-export default function GoogleDriveClone() {
-  const [currentFolder, setCurrentFolder] = useState<string>("root");
+export default function DriveContents(props: {
+  files: (typeof files.$inferSelect)[];
+  folders: (typeof folders.$inferSelect)[];
+}) {
+  const [currentFolder, setCurrentFolder] = useState<number>(1);
 
-  const getCurrentFiles = () => {
-    return mockFiles.filter((f) => f.parent === currentFolder);
-  };
+  const renderedFolders = props.folders.map((folder) => (
+    <FolderRow
+      key={folder.id}
+      folder={folder}
+      handleFolderClick={() => handleFolderClick(folder.id)}
+    />
+  ));
 
-  const getCurrentFolders = () => {
-    return mockFolders.filter((f) => f.parent === currentFolder);
-  };
+  const renderedFiles = props.files.map((file) => (
+    <FileRow key={file.id} file={file} />
+  ));
 
-  const handleFolderClick = (folderId: string) => {
+  const handleFolderClick = (folderId: number) => {
     setCurrentFolder(folderId);
   };
 
@@ -25,18 +32,18 @@ export default function GoogleDriveClone() {
     const breadcrumbs = [];
     let currentId = currentFolder;
 
-    while (currentId !== "root") {
-      const folder = mockFolders.find((file) => file.id === currentId);
+    while (currentId !== 1) {
+      const folder = props.folders.find((file) => file.id === currentId);
       if (folder) {
         breadcrumbs.unshift(folder);
-        currentId = folder.parent ?? "root";
+        currentId = folder.parent ?? 1;
       } else {
         break;
       }
     }
 
     return breadcrumbs;
-  }, [currentFolder]);
+  }, [currentFolder, props.folders]);
 
   const handleUpload = () => {
     alert("Upload functionality would be implemented here");
@@ -48,7 +55,7 @@ export default function GoogleDriveClone() {
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center">
             <Button
-              onClick={() => setCurrentFolder("root")}
+              onClick={() => setCurrentFolder(1)}
               variant="ghost"
               className="mr-2"
             >
@@ -83,16 +90,8 @@ export default function GoogleDriveClone() {
             </div>
           </div>
           <ul>
-            {getCurrentFolders().map((f) => (
-              <FolderRow
-                key={f.id}
-                f={f}
-                handleFolderClick={() => handleFolderClick(f.id)}
-              />
-            ))}
-            {getCurrentFiles().map((f) => (
-              <FileRow key={f.id} f={f} />
-            ))}
+            {renderedFolders}
+            {renderedFiles}
           </ul>
         </div>
       </div>
