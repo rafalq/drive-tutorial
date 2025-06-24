@@ -9,6 +9,7 @@ import { FileRow, FolderRow } from "./dir-row";
 export default function DriveContents(props: {
   files: (typeof files.$inferSelect)[];
   folders: (typeof folders.$inferSelect)[];
+  parents: (typeof folders.$inferSelect)[];
 }) {
   const renderedFolders = props.folders.map((folder) => (
     <FolderRow key={folder.id} folder={folder} />
@@ -17,24 +18,6 @@ export default function DriveContents(props: {
   const renderedFiles = props.files.map((file) => (
     <FileRow key={file.id} file={file} />
   ));
-
-  const breadcrumbs: unknown[] = [];
-  // const breadcrumbs = useMemo(() => {
-  //   const breadcrumbs = [];
-  //   let currentId = currentFolder;
-
-  //   while (currentId !== 1) {
-  //     const folder = props.folders.find((file) => file.id === currentId);
-  //     if (folder) {
-  //       breadcrumbs.unshift(folder);
-  //       currentId = folder.parent ?? 1;
-  //     } else {
-  //       break;
-  //     }
-  //   }
-
-  //   return breadcrumbs;
-  // }, [currentFolder, props.folders]);
 
   const handleUpload = () => {
     alert("Upload functionality would be implemented here");
@@ -51,7 +34,7 @@ export default function DriveContents(props: {
             >
               My Drive
             </Link>
-            {breadcrumbs.map((folder) => (
+            {props.parents.map((folder) => (
               <div key={folder.id} className="flex items-center">
                 <ChevronRight className="mx-2 text-gray-500" size={16} />
 

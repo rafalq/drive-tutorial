@@ -4,6 +4,24 @@ import { files as filesSchema } from "@/server/db/schema";
 import { folders as foldersSchema } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 
+async function getAllParents(folderId: number) {
+  const parents = [];
+  let currentId: number | null = folderId;
+
+  while (currentId !== null) {
+    const folder = await db
+      .selectDistinct()
+      .from(foldersSchema)
+      .where(eq(foldersSchema.id, currentId));
+
+    if (!folder[0]) throw new Error("Folder not found");
+    parents.unshift(folder[0]);
+    currentId = folder[0]?.parent;
+  }
+
+  return parents;
+}
+
 type GoogleDriveCloneProps = {
   params: Promise<{ folderId: string }>;
 };
@@ -24,11 +42,18 @@ export default async function GoogleDriveClone(props: GoogleDriveCloneProps) {
     );
   }
 
-  const files = await db.select().from(filesSchema);
-  const folders = await db
+  const filesPromise = db.select().from(filesSchema);
+  const foldersPromise = db
     .select()
     .from(foldersSchema)
     .where(eq(foldersSchema.parent, parsedFolderId));
+  const parentsPromise = getAllParents(parsedFolderId);
 
-  return <DriveContents files={files} folders={folders} />;
+  const [files, folders, parents] = await Promise.all([
+    filesPromise,
+    foldersPromise,
+    parentsPromise,
+  ]);
+
+  return <DriveContents files={files} folders={folders} parents={parents} />;
 }
