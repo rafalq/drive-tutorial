@@ -3,47 +3,38 @@
 import { Button } from "@/components/ui/button";
 import { type files, type folders } from "@/server/db/schema";
 import { ChevronRight, Upload } from "lucide-react";
-import { useMemo, useState } from "react";
+import Link from "next/link";
 import { FileRow, FolderRow } from "./dir-row";
 
 export default function DriveContents(props: {
   files: (typeof files.$inferSelect)[];
   folders: (typeof folders.$inferSelect)[];
 }) {
-  const [currentFolder, setCurrentFolder] = useState<number>(1);
-
   const renderedFolders = props.folders.map((folder) => (
-    <FolderRow
-      key={folder.id}
-      folder={folder}
-      handleFolderClick={() => handleFolderClick(folder.id)}
-    />
+    <FolderRow key={folder.id} folder={folder} />
   ));
 
   const renderedFiles = props.files.map((file) => (
     <FileRow key={file.id} file={file} />
   ));
 
-  const handleFolderClick = (folderId: number) => {
-    setCurrentFolder(folderId);
-  };
+  const breadcrumbs: unknown[] = [];
+  // const breadcrumbs = useMemo(() => {
+  //   const breadcrumbs = [];
+  //   let currentId = currentFolder;
 
-  const breadcrumbs = useMemo(() => {
-    const breadcrumbs = [];
-    let currentId = currentFolder;
+  //   while (currentId !== 1) {
+  //     const folder = props.folders.find((file) => file.id === currentId);
+  //     if (folder) {
+  //       breadcrumbs.unshift(folder);
+  //       currentId = folder.parent ?? 1;
+  //     } else {
+  //       break;
+  //     }
+  //   }
 
-    while (currentId !== 1) {
-      const folder = props.folders.find((file) => file.id === currentId);
-      if (folder) {
-        breadcrumbs.unshift(folder);
-        currentId = folder.parent ?? 1;
-      } else {
-        break;
-      }
-    }
-
-    return breadcrumbs;
-  }, [currentFolder, props.folders]);
+  //   return breadcrumbs;
+  // }, [currentFolder, props.folders]);
 
   const handleUpload = () => {
     alert("Upload functionality would be implemented here");
@@ -54,22 +45,17 @@ export default function DriveContents(props: {
       <div className="mx-auto max-w-6xl">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center">
-            <Button
-              onClick={() => setCurrentFolder(1)}
-              variant="ghost"
-              className="mr-2"
+            <Link
+              href={"/f/1"}
+              className="mr-2 rounded-sm p-1 transition-all duration-100 hover:border hover:border-gray-200"
             >
               My Drive
-            </Button>
+            </Link>
             {breadcrumbs.map((folder) => (
               <div key={folder.id} className="flex items-center">
                 <ChevronRight className="mx-2 text-gray-500" size={16} />
-                <Button
-                  onClick={() => handleFolderClick(folder.id)}
-                  variant="ghost"
-                >
-                  {folder.name}
-                </Button>
+
+                <Link href={`/f/${folder.id}`}>{folder.name}</Link>
               </div>
             ))}
           </div>
