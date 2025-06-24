@@ -11,7 +11,7 @@
 ## Note from 20.06.2025
 
 - [x] Change folders to link components, remove all client state
-- [] Clean up the database and data fetching patterns
+- [x] Clean up the database and data fetching patterns
 - [] Create a real homepage
 
 ## Note from 17.06.2025

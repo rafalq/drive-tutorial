@@ -1,8 +1,14 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { type files_table, type folders_table } from "@/server/db/schema";
-import { ChevronRight, Upload } from "lucide-react";
+import {
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { FileRow, FolderRow } from "./dir-row";
 
@@ -42,13 +48,19 @@ export default function DriveContents(props: {
               </div>
             ))}
           </div>
-          <Button
-            onClick={handleUpload}
-            className="bg-blue-600 text-white hover:bg-blue-700"
-          >
-            <Upload className="mr-2" size={20} />
-            Upload
-          </Button>
+          <div className="flex items-center justify-center gap-4">
+            <SignedOut>
+              <SignInButton />
+              <SignUpButton>
+                <button className="h-10 cursor-pointer rounded-full bg-[#6c47ff] px-4 text-sm font-medium text-white sm:h-12 sm:px-5 sm:text-base">
+                  Sign Up
+                </button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+          </div>
         </div>
         <div className="rounded-lg bg-gray-800 shadow-xl">
           <div className="border-b border-gray-700 px-6 py-4">
